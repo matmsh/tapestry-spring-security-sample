@@ -5,8 +5,8 @@
 	<body>
 		<h1>Usecase Tapestry Spring Security Module for Tapestry 5.3.x</h1>
 		<p>
-		    <a href="https://github.com/lobbin/tapestry-spring-security">
-			Tapestry Spring Security </a> is built on the  Spring
+		    <a href="https://github.com/antalk/Tapestry-Spring-Security ">
+			Tapestry Spring Security </a> (for Tapestry 5.3.x) is built on the  Spring
 			Security 3.1.0.RELEASE. This little demo tries to clarify how to
 			use Tapestry Spring Security Module. <br/>
 			
