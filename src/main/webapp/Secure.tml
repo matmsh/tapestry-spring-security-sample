@@ -1,0 +1,10 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+<body>
+	<p>Hi,</p>
+	
+	<p>Welcome to a page secured by a @Secured("ROLE_DEFAULT") annotation. Before you get here you are automatically redirected to the login
+	page.</p>
+	
+	<p><t:pagelink t:page="Start">Back to start page</t:pagelink></p>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd">
+	<head>
+		<title>Usecase Tapestry Spring Security Module </title>
+	</head>
+	<body>
+		<h1>Usecase Tapestry Spring Security Module for Tapestry 5.3.x</h1>
+		<p>
+		    <a href="https://github.com/lobbin/tapestry-spring-security">
+			Tapestry Spring Security </a> is built on the  Spring
+			Security 3.1.0.RELEASE. This little demo tries to clarify how to
+			use Tapestry Spring Security Module. <br/>
+			
+			The source of the is demo is here (to add link).
+            This demo is originally created by Robin Helgelin. <br/>
+            		 					
+			
+		</p>
+		<h2>Demo Users</h2>
+		<p>
+			There are two users (Principals) in the system. They have
+			different roles (Authorities).
+		</p>
+		<table border="1" cellpadding="3" cellspacing="2">
+			<thead>
+				<th>Principal</th>
+				<th>Authorities</th>
+				<th>Password</th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>mona</td>
+					<td>ROLE_DEFAULT, ROLE_TELLER</td>
+					<td>
+						<em>mona</em>
+					</td>
+				</tr>
+				<tr>
+					<td>milli</td>
+					<td>ROLE_DEFAULT, ROLE_ADMIN</td>
+					<td>
+						<em>milli</em>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+		  Look into <em>PROJECT_HOME/src/main/java/nu/localhost/tapestry5/springsecuritytest/services/internal/MyUserDetailsService.java</em> 
+		  how they where set up. You easy get an idea how to integrate your preferred legacy authentication mechanism. 
+		</p>
+		<h2>Security Markup</h2>
+		<p>
+		  There a two <em>Component</em>s that ease your life in security concerns.
+	  </p>
+	  <ol>
+	    <li>
+<pre>
+<b>&lt;t:security.ifloggedin&gt;</b>
+&#160;&#160;...
+&#160;&#160;this area is only visible to logged in users
+&#160;&#160;...
+&#160;&#160;<b>&lt;t:parameter name="else"&gt;</b>
+&#160;&#160;&#160;&#160;...
+&#160;&#160;&#160;&#160;this block is visible if you are not logged in
+&#160;&#160;&#160;&#160;...
+&#160;&#160;<b>&lt;/t:parameter&gt;</b>
+&#160;&#160;...
+<b>&lt;/t:security.ifloggedin&gt;</b>
+</pre> 
+	    </li>
+	    <li>
+<pre>
+<b>&lt;t:security/ifrole role="ROLE_ADMIN"&gt;</b>
+&#160;&#160;...
+&#160;&#160;this area is only visible to users logged in with ROLE_ADMIN Authority
+&#160;&#160;...
+&#160;&#160;<b>&lt;t:parameter name="else"&gt;</b>
+&#160;&#160;&#160;&#160;...
+&#160;&#160;&#160;&#160;this block is visible if you don't have ROLE_ADMIN
+&#160;&#160;&#160;&#160;...
+&#160;&#160;<b>&lt;/t:parameter&gt;</b>
+&#160;&#160;...
+<b>&lt;/t:security/ifrole&gt;</b>
+</pre>		    
+	    </li>
+	  </ol>
+		  
+		<div t:type="security/ifloggedin">
+			<p>
+				You are logged in, welcome!
+			</p>
+			<t:security.ifrole role="ROLE_ADMIN">
+				<p>
+					You are even logged as admin, cool!
+				</p>
+        <t:parameter name="else">
+          <p>
+            Sorry, you don't have admin credentials.
+          </p>
+        </t:parameter>
+			</t:security.ifrole>
+			<t:parameter name="else">
+				Not logged in, please
+				<t:pagelink t:page="LoginPage">do</t:pagelink>.
+			</t:parameter>
+		</div>
+		<h2>Securing static resources</h2>
+		<p>
+		  If you want to secure a static resource you can use a contribution to the FilterSecurityInterceptor.
+<pre>
+public static void contributeFilterSecurityInterceptor(
+&#160;&#160;Configuration&lt;RequestInvocationDefinition&gt; configuration ) {
+
+&#160;&#160;configuration.add( new RequestInvocationDefinition( "/ltd.pdf", "ROLE_ADMIN" ) );
+}
+</pre> 		  
+      You can also use regular expressions in ant style to secure whole directories.
+		</p>
+		<h2>How can I access the UserDetails in my own application?</h2>
+		<p>
+		  It's really easy. Currently this demo application recognizes you as <b><t:userdetails /></b>. Obviously that
+		  doesn't mean that you're <em><t:userdetails /></em> ;) Look at 
+		  <em>PROJECT_HOME/src/main/java/nu/localhost/tapestry5/springsecuritytest/components/UserDetails.java</em>
+		  on how to access springs SecurityContextHolder.
+<pre>
+Authentication currentUser = null;
+currentUser = SecurityContextHolder.getContext().getAuthentication();
+</pre>
+		</p>
+		<h1>Try it yourself</h1>
+    <table border="1" cellpadding="0" cellspacing="2">
+      <tr>
+        <td colspan="3"><h3>Annotations</h3></td>
+      </tr> 
+      <tr>
+        <td rowspan="2" width="20%"><t:pagelink t:page="Secure">A Secure Page</t:pagelink></td>
+        <td>needs: ROLE_DEFAULT</td>
+        <td>This page is protected by a @Secured("ROLE_DEFAULT") annotation. Both <b>mona</b> and <b>milli</b> should be able to see this page (after successful authentication).</td>
+      </tr>
+      <tr>
+        <td colspan="2">find the source at <em>PROJECT_HOME/src/main/java/nu/localhost/tapestry5/springsecuritytest/pages/Secure.java</em></td> 
+      </tr>
+      <tr>
+        <td rowspan="2" width="15%"><t:pagelink t:page="VerySecure">A VERY Secure Page</t:pagelink></td>
+        <td>needs: ROLE_ADMIN</td>
+        <td>This page is protected by a @Secured("ROLE_ADMIN") annotation. Only <b>milli</b> should be able to see this page (after successful authentication).</td>
+      </tr>
+      <tr>
+        <td colspan="2">find the source at <em>PROJECT_HOME/src/main/java/nu/localhost/tapestry5/springsecuritytest/pages/VerySecure.java</em></td> 
+      </tr>
+      <tr>
+        <td rowspan="2" width="15%">score: ${counter} [<a t:type="actionlink" t:id="counter">increase</a>]</td>
+        <td>needs: ROLE_TELLER</td>
+        <td>This is a method protected by a @Secured("ROLE_TELLER") annotation. Only <b>mona</b> should be able to see this page (after successful authentication).</td>
+      </tr>
+      <tr>
+        <td colspan="2">find the source at <em>PROJECT_HOME/src/main/java/nu/localhost/tapestry5/springsecuritytest/pages/Start.java</em></td> 
+      </tr>
+      <tr>
+        <td colspan="3"><h3>Components</h3></td>
+      </tr>
+      <tr>
+        <td rowspan="2" width="15%">
+          <div t:type="security/ifloggedin">
+               <t:security.ifrole role="ROLE_ADMIN">
+			        <div style="width:100%;height:100%;background-color:yellow;">&#160;</div>
+		            <t:parameter name="else">
+		                <div style="width:100%;height:100%;background-color:green;">&#160;</div>
+		            </t:parameter>
+			  </t:security.ifrole>
+                  
+             <t:parameter name="else">
+	               <div style="width:100%;height:100%;background-color:red;">&#160;</div>
+	          </t:parameter>
+          </div>
+        </td>
+        <td>needs: -</td>
+        <td>
+          <table border="1">
+            <tr><td style="background-color:red;">&#160;&#160;&#160;</td><td>not logged in at all</td></tr>
+            <tr><td style="background-color:green;">&#160;&#160;&#160;</td><td>logged in</td></tr>
+            <tr><td style="background-color:yellow;">&#160;&#160;&#160;</td><td>logged in with ROLE_ADMIN</td></tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">See the markup at <em>PROJECT_HOME/src/main/webapp/Start.tml</em></td> 
+      </tr>
+      <tr>
+        <td colspan="3"><h3>Static resources</h3></td>
+      </tr>
+      <tr>
+        <td rowspan="2" width="15%">A static and <a href="ltd.pdf">secure PDF</a></td>
+        <td>needs: ROLE_ADMIN</td>
+        <td>This resource is secured via a contribution to the FilterSecurityInterceptor. Only <b>milli</b> should be able to see this PDF (after successful authentication).</td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          find the source in <em>PROJECT_HOME/src/main/java/nu/localhost/tapestry5/springsecuritytest/services/TestsecurityModule.java</em>
+        </td> 
+      </tr>
+      <tr>
+        <td colspan="3"><h3>Login</h3></td>
+      </tr>
+      <tr>
+        <td width="15%"><t:pagelink t:page="LoginPage">just do it</t:pagelink>!</td>
+        <td>needs: -</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td colspan="3"><h3>Logout</h3></td>
+      </tr>
+      <tr>
+        <td rowspan="2" width="15%"><a t:type="actionlink" t:id="logout">just do it</a>!</td>
+        <td>needs: -</td>
+        <td>-</td>
+      </tr>
+    </table>
+    <h2>Links</h2>
+    <p>
+      <a href="http://www.localhost.nu/java/tapestry-spring-security/">Tapestry Spring Security for Tapestry 5.1.x</a><br/>
+       <a href="https://github.com/antalk/Tapestry-Spring-Security">Tapestry Spring Security for Tapestry 5.3.x</a><br/>
+      <a href="http://static.springframework.org/spring-security/site/index.html">Spring Security</a><br/>
+      <a href="http://tapestry.apache.org/">Tapestry 5</a>
+    </p>
+	</body>
+</html>
