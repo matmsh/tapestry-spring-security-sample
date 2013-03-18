@@ -61,6 +61,9 @@ public class TestsecurityModule {
     public static void setupApplicationServiceOverrides(MappedConfiguration<Class<?>,Object> configuration)
     {
       configuration.add(PasswordEncoder.class, new ShaPasswordEncoder());
+      // Uncomment this line to run in Jboss 7. 
+     // configuration.add(ClasspathURLConverter.class, new JBoss7ClasspathURLConverterImpl());
+      
     }
     
     
@@ -87,10 +90,8 @@ public class TestsecurityModule {
             "anonymous,ROLE_ANONYMOUS" );
         configuration.add( "spring-security.password.salt", "DEADBEEF" );
         
-        
-       // Uncomment this line to run in Jboss 7. 
-       // configuration.add(ClasspathURLConverter.class, new JBoss7ClasspathURLConverterImpl());
-        
+
+ 
     }
 
 }
